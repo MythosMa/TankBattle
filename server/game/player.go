@@ -1,17 +1,27 @@
 package game
 
-import "log"
+import (
+	"log"
+
+	"github.com/gorilla/websocket"
+)
 
 type Player struct {
-	ID string
+	ID   string
+	Conn *websocket.Conn
 }
 
-func NewPlayer(id string) *Player {
+func NewPlayer(id string, conn *websocket.Conn) *Player {
 	return &Player{
-		ID: id,
+		ID:   id,
+		Conn: conn,
 	}
 }
 
 func (p *Player) SendMessage(message string) {
-	log.Printf("Sending message to player %s: %s", p.ID, message)
+	err := p.Conn.WriteMessage(websocket.TextMessage, []byte(message))
+	if err != nil {
+		log.Println("Error sending message to player", p.ID, err)
+		p.Conn.Close()
+	}
 }

@@ -2,6 +2,8 @@ package game
 
 import (
 	"log"
+
+	"github.com/gorilla/websocket"
 )
 
 type Game struct {
@@ -14,9 +16,10 @@ func NewGame() *Game {
 	}
 }
 
-func (g *Game) AddPlayer(id string) {
-	g.Players[id] = NewPlayer(id)
+func (g *Game) AddPlayer(id string, conn *websocket.Conn) {
+	g.Players[id] = NewPlayer(id, conn)
 	log.Printf("Player %s joined the game", id)
+	g.Broadcast("Player " + id + " joined the game")
 }
 
 func (g *Game) RemovePlayer(id string) {
