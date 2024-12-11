@@ -7,14 +7,19 @@ import (
 )
 
 type Player struct {
-	ID   string
-	Conn *websocket.Conn
+	ID        string
+	Conn      *websocket.Conn
+	DataModel *PlayerGameDataModel
 }
 
 func NewPlayer(id string, conn *websocket.Conn) *Player {
 	return &Player{
 		ID:   id,
 		Conn: conn,
+		DataModel: &PlayerGameDataModel{
+			X: 0,
+			Y: 0,
+		},
 	}
 }
 
