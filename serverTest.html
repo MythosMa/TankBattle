@@ -2,29 +2,45 @@
 <html>
   <head>
     <title>WebSocket Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      messages {
+        border: 1px solid #ccc;
+        height: 200px;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+      }
+      messages div {
+        padding: 5px;
+      }
+    </style>
   </head>
   <body>
     <h1>WebSocket Client</h1>
-    <button onclick="connectWebSocket()">Connect WebSocket</button>
+    <div id="messages"></div>
     <input id="message" type="text" placeholder="Message" />
     <button onclick="sendMessage()">Send</button>
 
     <script>
       let ws;
+      let playerID = "player-" + Math.floor(Math.random() * 1000);
+      let messagesDiv = document.getElementById("messages");
 
       function connectWebSocket() {
-        ws = new WebSocket("ws://localhost:8080/ws");
+        ws = new WebSocket(`ws://localhost:8080/ws?userid=${playerID}`);
 
         ws.onopen = function () {
-          console.log("Connected to WebSocket server.");
+          appendMessage("Connected as " + playerID);
         };
 
         ws.onmessage = function (event) {
-          console.log("Received message from server:", event.data);
+          appendMessage(event.data);
         };
 
         ws.onclose = function () {
-          console.log("WebSocket connection closed.");
+          appendMessage("Disconnected from server.");
         };
       }
 
@@ -36,6 +52,15 @@
           console.log("WebSocket is not connected.");
         }
       }
+
+      function appendMessage(message) {
+        let div = document.createElement("div");
+        div.textContent = message;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      connectWebSocket();
     </script>
   </body>
 </html>

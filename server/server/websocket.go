@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gorilla/websocket"
 
@@ -25,25 +26,31 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 	log.Println("WebSocket connection established")
 
-	playerID := r.RemoteAddr
+	queryParams, err := url.ParseQuery(r.URL.RawQuery)
+
+	if err != nil {
+		log.Println("Error parsing query parameters:", err)
+		return
+	}
+
+	playerID := queryParams.Get(("userid"))
+
+	if playerID == "" {
+		log.Println("Player ID not provided")
+		return
+	}
 	gameInstance.AddPlayer(playerID, conn)
 
 	for {
-		messageType, message, err := conn.ReadMessage()
+		_, message, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("WebSocket read error:", err)
+			gameInstance.RemovePlayer(playerID)
 			break
 		}
 
 		log.Printf("Received WebSocket message: %s", message)
 
-		err = conn.WriteMessage(messageType, message)
-		if err != nil {
-			log.Println("WebSocket write error:", err)
-			gameInstance.RemovePlayer(playerID)
-			break
-		}
-
-		gameInstance.Broadcast(string(message))
+		gameInstance.Broadcast(playerID + ":" + string(message))
 	}
 }
