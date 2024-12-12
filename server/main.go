@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"tank-game-server/game"
-	"tank-game-server/server"
+	"tank-tank-battle-server/game"
+	"tank-tank-battle-server/server"
 )
 
 func main() {

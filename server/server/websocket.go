@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"tank-game-server/game"
+	"tank-tank-battle-server/game"
 )
 
 var gameInstance = game.NewGame()

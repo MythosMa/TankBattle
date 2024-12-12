@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"tank-game-server/config"
+	"tank-tank-battle-server/config"
 )
 
 func Start() {

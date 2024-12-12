@@ -1,5 +1,5 @@
 package config
 
 const (
-	ServerPort = ":8080"
+	ServerPort = ":3000"
 )
