@@ -70,10 +70,10 @@ public class WebSocketManager : MonoBehaviour
 
     public void SendNormalData(string command, string data)
     {
-        var message = new
+        var message = new ServerMessage
         {
-            command = command,
-            data = data
+            Command = command,
+            Data = data,
         };
         string jsonMessage = JsonUtility.ToJson(message);
 
@@ -84,7 +84,7 @@ public class WebSocketManager : MonoBehaviour
     {
         string requestId = Tools.GenerateId();
 
-        var message = new
+        var message = new ServerMessage
         {
             Command = command,
             RequestId = requestId,
@@ -96,7 +96,7 @@ public class WebSocketManager : MonoBehaviour
 
         string jsonMessage = JsonUtility.ToJson(message);
 
-        Debug.Log("Sending request: " + message);
+        Debug.Log("Sending to server:" + jsonMessage);
 
         SendingDataToServer(jsonMessage);
     }
@@ -116,14 +116,14 @@ public class WebSocketManager : MonoBehaviour
     private void HandleServerMessage(string message)
     {
         var serverMessage = JsonUtility.FromJson<ServerMessage>(message);
-        if (serverMessage.requestId != null && pendingPromises.ContainsKey(serverMessage.requestId))
+        if (serverMessage.RequestId != null && pendingPromises.ContainsKey(serverMessage.RequestId))
         {
-            pendingPromises[serverMessage.requestId].SetResponse(serverMessage.data);
-            pendingPromises.Remove(serverMessage.requestId);
+            pendingPromises[serverMessage.RequestId].SetResponse(serverMessage.Data);
+            pendingPromises.Remove(serverMessage.RequestId);
         }
         else
         {
-            DealDataWithCommand(serverMessage.command, serverMessage.data);
+            DealDataWithCommand(serverMessage.Command, serverMessage.Data);
         }
 
     }
@@ -147,9 +147,9 @@ public class WebSocketManager : MonoBehaviour
 [Serializable]
 public class ServerMessage
 {
-    public string command;
-    public string data;
-    public string requestId;
+    public string Command;
+    public string Data;
+    public string RequestId;
 }
 
 
