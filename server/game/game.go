@@ -1,11 +1,5 @@
 package game
 
-import (
-	"log"
-
-	"github.com/gorilla/websocket"
-)
-
 type Game struct {
 	Players map[string]*Player
 }
@@ -16,19 +10,25 @@ func NewGame() *Game {
 	}
 }
 
-func (g *Game) AddPlayer(id string, conn *websocket.Conn) {
-	g.Players[id] = NewPlayer(id, conn)
-	log.Printf("Player %s joined the game", id)
-	g.Broadcast("Player " + id + " joined the game")
+func (g *Game) AddPlayer(player *Player) {
+	g.Players[player.ID] = player
+	g.Broadcast("Player " + player.ID + " joined the game")
 }
 
-func (g *Game) RemovePlayer(id string) {
-	delete(g.Players, id)
-	log.Printf("Player %s left the game", id)
+func (g *Game) RemovePlayer(player *Player) {
+	if player.ID != "" {
+		delete(g.Players, player.ID)
+		g.Broadcast("Player " + player.ID + " left the game")
+	}
 }
 
 func (g *Game) Broadcast(message string) {
 	for _, player := range g.Players {
 		player.SendMessage(message)
 	}
+}
+
+func (g *Game) CheckHasPlayer(PlayerName string) bool {
+	_, ok := g.Players[PlayerName]
+	return ok
 }

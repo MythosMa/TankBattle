@@ -8,8 +8,8 @@ import (
 )
 
 func Start() {
-	http.HandleFunc("/", handleHttp)
-	http.HandleFunc("/ws", handleWebSocket)
+	http.HandleFunc("/", HandleHttp)
+	http.HandleFunc("/ws", HandleWebSocket)
 
 	log.Println("Server running on ", config.ServerPort)
 	err := http.ListenAndServe(config.ServerPort, nil)
@@ -18,6 +18,6 @@ func Start() {
 	}
 }
 
-func handleHttp(w http.ResponseWriter, r *http.Request) {
+func HandleHttp(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, Tank Game Server!"))
 }

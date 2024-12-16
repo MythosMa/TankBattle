@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -12,15 +13,14 @@ type Player struct {
 	DataModel *PlayerGameDataModel
 }
 
-func NewPlayer(id string, conn *websocket.Conn) *Player {
+func NewPlayer(conn *websocket.Conn) *Player {
 	return &Player{
-		ID:   id,
 		Conn: conn,
-		DataModel: &PlayerGameDataModel{
-			X: 0,
-			Y: 0,
-		},
 	}
+}
+
+func (p *Player) SetPlayerName(id string) {
+	p.ID = id
 }
 
 func (p *Player) SendMessage(message string) {
@@ -28,5 +28,17 @@ func (p *Player) SendMessage(message string) {
 	if err != nil {
 		log.Println("Error sending message to player", p.ID, err)
 		p.Conn.Close()
+	}
+}
+
+func (p *Player) SendDataMessage(message interface{}) {
+	msgBytes, err := json.Marshal(message)
+	if err != nil {
+		log.Println("Error marshalling data message to player", p.ID, err)
+		return
+	}
+
+	if err := p.Conn.WriteMessage(websocket.TextMessage, msgBytes); err != nil {
+		log.Println("Error sending data message to player")
 	}
 }
