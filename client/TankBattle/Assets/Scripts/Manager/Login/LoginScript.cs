@@ -14,27 +14,42 @@ public class LoginScript : MonoBehaviour
         string playerName = playerNameInput.text;
         if (playerName != "")
         {
-            var data = new { playerName = playerName };
+            var data = new LoginRequestData { PlayerName = playerName };
             WebSocketManager.Instance.SendRequestAsync(WebSocketCommand.LOGIN, JsonUtility.ToJson(data), LoginCallback);
         }
         else
         {
-            ToastNotification.Show("Please enter your name");
+            UIManager.Instance.BroadcastMessage("Please enter your name");
         }
 
     }
 
     private void LoginCallback(string resultData)
     {
-        Debug.Log(resultData);
+        LoginResponseData response = JsonUtility.FromJson<LoginResponseData>(resultData);
+        if (response.Success)
+        {
+            Debug.Log(response);
+        }
+        else
+        {
+            UIManager.Instance.ShowToastMessage(response.ErrMessage);
+        }
+
+    }
+
+    [Serializable]
+    private class LoginRequestData
+    {
+        public string PlayerName;
     }
 
     [Serializable]
     private class LoginResponseData
     {
-        public string playerName;
-        public string errMessage;
-        public bool success;
+        public string PlayerName;
+        public string ErrMessage;
+        public bool Success;
     }
 
 }

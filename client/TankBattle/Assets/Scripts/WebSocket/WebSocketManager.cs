@@ -96,8 +96,6 @@ public class WebSocketManager : MonoBehaviour
 
         string jsonMessage = JsonUtility.ToJson(message);
 
-        Debug.Log("Sending to server:" + jsonMessage);
-
         SendingDataToServer(jsonMessage);
     }
 
@@ -115,6 +113,7 @@ public class WebSocketManager : MonoBehaviour
 
     private void HandleServerMessage(string message)
     {
+        Debug.Log("Received message from server: " + message);
         var serverMessage = JsonUtility.FromJson<ServerMessage>(message);
         if (serverMessage.RequestId != null && pendingPromises.ContainsKey(serverMessage.RequestId))
         {
@@ -133,6 +132,9 @@ public class WebSocketManager : MonoBehaviour
         switch (command)
         {
             // TODO: handle commands
+            case WebSocketCommand.NORMAL:
+                UIManager.Instance.ShowToastMessage(data);
+                break;
             default:
                 break;
         }

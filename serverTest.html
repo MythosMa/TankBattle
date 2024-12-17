@@ -29,9 +29,10 @@
       let messagesDiv = document.getElementById("messages");
 
       function connectWebSocket() {
-        ws = new WebSocket(
-          `ws://www.mythosma.com/tank-battle/ws?userid=${playerID}`
-        );
+        // ws = new WebSocket(
+        //   `ws://www.mythosma.com/tank-battle/ws?userid=${playerID}`
+        // );
+        ws = new WebSocket(`ws://localhost:3000/ws?userid=${playerID}`);
 
         ws.onopen = function () {
           appendMessage("Connected as " + playerID);

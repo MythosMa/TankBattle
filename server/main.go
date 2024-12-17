@@ -10,6 +10,6 @@ import (
 func main() {
 	log.Println("Starting server...")
 
-	game.NewGame()
+	game.GetGameInstance()
 	server.Start()
 }
