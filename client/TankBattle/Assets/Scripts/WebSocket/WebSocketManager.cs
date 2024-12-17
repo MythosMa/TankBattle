@@ -14,6 +14,7 @@ public class WebSocketManager : MonoBehaviour
     private WebSocket ws;
     // Start is called before the first frame update
     private string wsUrl = "ws://localhost:3000/ws";
+    // private string wsUrl = "ws://www.mythosma.com/tank-battle/ws";
 
     private Dictionary<string, WebSocketPromise> pendingPromises = new Dictionary<string, WebSocketPromise>();
 
