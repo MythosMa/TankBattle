@@ -20,9 +20,9 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println("WebSocket upgrade error:", err)
 		return
 	}
-	defer conn.Close()
+	// defer conn.Close()
 	log.Println("WebSocket connection established")
 
 	player := game.NewPlayer(conn)
-	player.ReceiveDataMessage()
+	player.StartPlayer()
 }

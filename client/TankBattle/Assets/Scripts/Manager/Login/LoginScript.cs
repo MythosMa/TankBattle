@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.WSA;
 
 public class LoginScript : MonoBehaviour
 {
@@ -19,7 +16,7 @@ public class LoginScript : MonoBehaviour
         }
         else
         {
-            UIManager.Instance.BroadcastMessage("Please enter your name");
+            UIController.Instance.BroadcastMessage("Please enter your name");
         }
 
     }
@@ -29,11 +26,12 @@ public class LoginScript : MonoBehaviour
         LoginResponseData response = JsonUtility.FromJson<LoginResponseData>(resultData);
         if (response.Success)
         {
-            Debug.Log(response);
+            PlayerModel.Instance.SetPlayerName(response.PlayerName);
+            GameController.Instance.StartGame();
         }
         else
         {
-            UIManager.Instance.ShowToastMessage(response.ErrMessage);
+            UIController.Instance.ShowToastMessage(response.ErrMessage);
         }
 
     }

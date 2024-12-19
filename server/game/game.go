@@ -1,9 +1,12 @@
 package game
 
 import (
+	"encoding/json"
+	"log"
 	"sync"
+	"time"
 
-	"tank-tank-battle-server/config"
+	"tank-tank-battle-server/constants"
 )
 
 type Game struct {
@@ -24,8 +27,50 @@ func GetGameInstance() *Game {
 
 // NewGame 创建一个新的 Game 实例
 func NewGame() *Game {
-	return &Game{
+	game := &Game{
 		Players: make(map[string]*Player),
+	}
+	go game.HandleGameLoop()
+	return game
+}
+
+func (g *Game) HandleGameLoop() {
+	ticker := time.NewTicker(time.Millisecond * 33) // 每 33ms 执行一次，即每秒 30 帧
+	defer ticker.Stop()
+	for {
+		<-ticker.C // 等待下一个周期到来
+		g.BroadGameData()
+	}
+}
+
+func (g *Game) BroadGameData() {
+	var playerModels []PlayerDataModel = make([]PlayerDataModel, 0)
+	for _, player := range g.Players {
+		playerModel := player.GetPlayerModel()
+		if playerModel != nil {
+			playerModels = append(playerModels, *playerModel)
+		}
+	}
+
+	if len(playerModels) == 0 {
+		return
+	}
+
+	var gameData = GameDataModel{
+		PlayerDataModels: playerModels,
+	}
+
+	jsonData, err := json.Marshal(gameData)
+	if err != nil {
+		log.Println("Error marshaling player data:")
+		return
+	}
+
+	for _, player := range g.Players {
+		player.SendDataMessage(map[string]interface{}{
+			"Command": constants.CommandGameData,
+			"Data":    string(jsonData),
+		})
 	}
 }
 
@@ -33,17 +78,17 @@ func NewGame() *Game {
 func (g *Game) AddPlayer(player *Player) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	g.Players[player.ID] = player
-	g.Broadcast("Player " + player.ID + " joined the game")
+	g.Players[player.PlayerName] = player
+	g.Broadcast("Player " + player.PlayerName + " joined the game")
 }
 
 // RemovePlayer 从游戏中移除玩家
 func (g *Game) RemovePlayer(player *Player) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if player.ID != "" {
-		delete(g.Players, player.ID)
-		g.Broadcast("Player " + player.ID + " left the game")
+	if player.PlayerName != "" {
+		delete(g.Players, player.PlayerName)
+		g.Broadcast("Player " + player.PlayerName + " left the game")
 	}
 }
 
@@ -51,7 +96,7 @@ func (g *Game) RemovePlayer(player *Player) {
 func (g *Game) Broadcast(message string) {
 	for _, player := range g.Players {
 		player.SendDataMessage(map[string]interface{}{
-			"Command": config.CommandNormalMessage,
+			"Command": constants.CommandNormalMessage,
 			"Data":    message,
 		})
 	}
@@ -63,4 +108,8 @@ func (g *Game) CheckHasPlayer(PlayerName string) bool {
 	defer g.mu.Unlock()
 	_, ok := g.Players[PlayerName]
 	return ok
+}
+
+type GameDataModel struct {
+	PlayerDataModels []PlayerDataModel
 }

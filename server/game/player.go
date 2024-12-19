@@ -3,16 +3,21 @@ package game
 import (
 	"encoding/json"
 	"log"
+	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 
-	"tank-tank-battle-server/config"
+	"tank-tank-battle-server/constants"
 )
 
 type Player struct {
-	ID        string
-	Conn      *websocket.Conn
-	DataModel *PlayerGameDataModel
+	PlayerName          string
+	Conn                *websocket.Conn
+	DataModel           *PlayerDataModel
+	playerRunning       bool
+	stopLoopMu          sync.Mutex
+	IsPlayerModelUpdate bool
 }
 
 func NewPlayer(conn *websocket.Conn) *Player {
@@ -21,8 +26,15 @@ func NewPlayer(conn *websocket.Conn) *Player {
 	}
 }
 
-func (p *Player) SetPlayerName(id string) {
-	p.ID = id
+func (p *Player) SetPlayerName(playerName string) {
+	p.PlayerName = playerName
+	p.DataModel = &PlayerDataModel{
+		PlayerName: playerName,
+		Direction:  constants.InputDirectionNone,
+		PositionX:  0,
+		PositionZ:  0,
+	}
+	p.StartGameLoop()
 }
 
 // server =============
@@ -33,12 +45,70 @@ type Message struct {
 	Data      string
 }
 
+func (p *Player) StartPlayer() {
+	go p.ReceiveDataMessage()
+}
+
+func (p *Player) StartGameLoop() {
+	p.playerRunning = true
+	go p.GameLoop()
+}
+
+// 处理游戏逻辑==================
+func (p *Player) GameLoop() {
+	ticker := time.NewTicker(time.Millisecond * 33) // 每 33ms 执行一次，即每秒 30 帧
+	defer ticker.Stop()
+
+	for {
+		<-ticker.C // 等待下一个周期到来
+		p.Update()
+
+		// 检查是否要停止循环
+		p.stopLoopMu.Lock()
+		if !p.playerRunning {
+			p.stopLoopMu.Unlock()
+			return // 退出循环
+		}
+		p.stopLoopMu.Unlock()
+	}
+}
+
+func (p *Player) Update() {
+	direction := p.DataModel.Direction
+	switch direction {
+	case constants.InputDirectionNone:
+		return
+	case constants.InputDirectionUp:
+		p.DataModel.PositionZ += 0.1
+	case constants.InputDirectionDown:
+		p.DataModel.PositionZ -= 0.1
+	case constants.InputDirectionLeft:
+		p.DataModel.PositionX -= 0.1
+	case constants.InputDirectionRight:
+		p.DataModel.PositionX += 0.1
+	}
+	p.IsPlayerModelUpdate = true
+}
+
+func (p *Player) GetPlayerModel() *PlayerDataModel {
+	if p.IsPlayerModelUpdate {
+		p.IsPlayerModelUpdate = false
+		return p.DataModel
+	}
+	return nil
+}
+
+// 处理websocket信息=============
 func (p *Player) ReceiveDataMessage() {
 	for {
 		_, message, err := p.Conn.ReadMessage()
 		if err != nil {
 			log.Println("WebSocket read error:", err)
+			p.stopLoopMu.Lock()
+			p.playerRunning = false
+			p.stopLoopMu.Unlock()
 			GetGameInstance().RemovePlayer(p)
+			p.Conn.Close()
 			break
 		}
 
@@ -53,24 +123,37 @@ func (p *Player) ReceiveDataMessage() {
 }
 
 func (p *Player) HandleRequestData(message Message) {
+	log.Println("player receive data:", message)
 	switch message.Command {
-	case config.CommandLogin:
+	case constants.CommandLogin:
 		p.HandleLogin(message)
+	case constants.CommandPlayerModel:
+		p.HandlePlayerModel(message)
 	}
 }
 
 func (p *Player) SendDataMessage(message interface{}) {
 	msgBytes, err := json.Marshal(message)
 	if err != nil {
-		log.Println("Error marshalling data message to player", p.ID, err)
+		log.Println("Error marshalling data message to player", p.PlayerName, err)
 		return
 	}
-
-	log.Println("Sending data message to player", p.ID, string(msgBytes))
 
 	if err := p.Conn.WriteMessage(websocket.TextMessage, msgBytes); err != nil {
 		log.Println("Error sending data message to player")
 	}
+}
+
+// playerModel ===============
+func (p *Player) HandlePlayerModel(message Message) {
+	var data PlayerModel
+	if err := json.Unmarshal([]byte(message.Data), &data); err != nil {
+		log.Println("WebSocket player model unmarshal error:", err)
+		return
+	}
+
+	p.DataModel.PlayerName = data.PlayerName
+	p.DataModel.Direction = data.InputDirection
 }
 
 // login ===============
@@ -81,7 +164,7 @@ type LoginData struct {
 func (p *Player) HandleLogin(message Message) {
 	var data LoginData
 	if err := json.Unmarshal([]byte(message.Data), &data); err != nil {
-		log.Println("WebSocket message unmarshal error:", err)
+		log.Println("WebSocket login unmarshal error:", err)
 		return
 	}
 
@@ -115,4 +198,10 @@ func (p *Player) HandleLogin(message Message) {
 			"Data":      string(dataJson),
 		},
 	)
+}
+
+// 玩家数据
+type PlayerModel struct {
+	PlayerName     string
+	InputDirection string
 }

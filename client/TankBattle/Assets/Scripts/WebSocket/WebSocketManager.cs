@@ -64,9 +64,6 @@ public class WebSocketManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-#if !UNITY_WEBGL || !UNITY_EDITOR
-        ws.DispatchMessageQueue();
-#endif
     }
 
     public void SendNormalData(string command, string data)
@@ -134,7 +131,10 @@ public class WebSocketManager : MonoBehaviour
         {
             // TODO: handle commands
             case WebSocketCommand.NORMAL:
-                UIManager.Instance.ShowToastMessage(data);
+                UIController.Instance.ShowToastMessage(data);
+                break;
+            case WebSocketCommand.GAME_DATA:
+                GameModel.Instance.HandleGameModelMessage(data);
                 break;
             default:
                 break;
