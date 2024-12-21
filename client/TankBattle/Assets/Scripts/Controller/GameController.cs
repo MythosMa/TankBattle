@@ -22,6 +22,7 @@ public class GameController : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        Application.runInBackground = true;
     }
     // Start is called before the first frame update
     void Start()
