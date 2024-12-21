@@ -5,9 +5,6 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance;
-    [SerializeField] List<GameObject> tankPrefabs;
-    [SerializeField] GameObject gameContainer;
-
     private bool _isPlayerControllerStart = false;
 
     private void Awake()
@@ -54,11 +51,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void CreatePlayerTank()
+    public void StartController()
     {
-        int playerTankIndex = Random.Range(0, tankPrefabs.Count);
-        GameObject tank = Instantiate(tankPrefabs[playerTankIndex], new Vector3(0, 0.15f, 0), tankPrefabs[playerTankIndex].transform.rotation, gameContainer.transform);
-        PlayerModel.Instance.SetPlayerTank(playerTankIndex, tank);
         _isPlayerControllerStart = true;
     }
 }

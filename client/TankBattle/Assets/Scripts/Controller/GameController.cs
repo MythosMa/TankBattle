@@ -8,6 +8,9 @@ public class GameController : MonoBehaviour
 
     public bool isGameRunning = false;
 
+    [SerializeField] List<GameObject> tankPrefabs;
+    [SerializeField] GameObject gameContainer;
+
     private void Awake()
     {
         if (Instance == null)
@@ -32,12 +35,17 @@ public class GameController : MonoBehaviour
 
     }
 
+    public void CreatePlayerTank(Player player)
+    {
+        int playerTankIndex = player.GetTankIndex();
+        GameObject tank = Instantiate(tankPrefabs[playerTankIndex], new Vector3(0, 0.15f, 0), tankPrefabs[playerTankIndex].transform.rotation, gameContainer.transform);
+        player.SetTank(playerTankIndex, tank);
+    }
+
     public void StartGame()
     {
         this.isGameRunning = true;
         UIController.Instance.SetLoginUIVisible(false);
-        PlayerController.Instance.CreatePlayerTank();
-
         GameModel.Instance.AddPlayer(PlayerModel.Instance.GetPlayer());
     }
 

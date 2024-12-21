@@ -29,6 +29,11 @@ public class PlayerModel : MonoBehaviour
         }
     }
 
+    public void InitPlayerName(string playerName)
+    {
+        player.SetPlayerName(playerName);
+    }
+
     void Update()
     {
         if (GameController.Instance.isGameRunning && isPlayerModelUpdate)
@@ -42,12 +47,6 @@ public class PlayerModel : MonoBehaviour
             HandleSendPlayerModelMessage(PlayerModelInfo);
         }
 
-    }
-
-    public void SetPlayerName(string name)
-    {
-        player.SetPlayerName(name);
-        isPlayerModelUpdate = true;
     }
 
     public void SetPlayerTank(int index, GameObject tank)

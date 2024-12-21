@@ -1245,12 +1245,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77ce191660899450e857e679f99ce68d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tankPrefabs:
-  - {fileID: 3393395878847182846, guid: 42ffa74f54a3b5f469196958719230b9, type: 3}
-  - {fileID: 7791502100231299867, guid: 7c62a64826a53804c9d6c47ec880f6e4, type: 3}
-  - {fileID: 2153454813623087484, guid: 3913fba33654f544880adc82db0f4952, type: 3}
-  - {fileID: 6549790420625637566, guid: e350a24e86e5c284d92aa431ec207e63, type: 3}
-  gameContainer: {fileID: 1000295639}
 --- !u!1 &934809704
 GameObject:
   m_ObjectHideFlags: 0
@@ -1436,6 +1430,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGameRunning: 0
+  tankPrefabs:
+  - {fileID: 3393395878847182846, guid: 42ffa74f54a3b5f469196958719230b9, type: 3}
+  - {fileID: 7791502100231299867, guid: 7c62a64826a53804c9d6c47ec880f6e4, type: 3}
+  - {fileID: 2153454813623087484, guid: 3913fba33654f544880adc82db0f4952, type: 3}
+  - {fileID: 6549790420625637566, guid: e350a24e86e5c284d92aa431ec207e63, type: 3}
+  gameContainer: {fileID: 1000295639}
 --- !u!114 &1056005137
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -12,6 +12,8 @@ public class Player
 
     private GameObject tank;
 
+    private bool isPlayerObjectCreated = false;
+
     public Player()
     {
         positionX = 0;
@@ -49,17 +51,44 @@ public class Player
         return tank;
     }
 
+    public void SetTankIndex(int index)
+    {
+        tankIndex = index;
+    }
+
+    public int GetTankIndex()
+    {
+        return tankIndex;
+    }
+
     public void SetPosition(float positionX, float positionZ)
     {
         this.positionX = positionX;
         this.positionZ = positionZ;
     }
 
+    public void CreatePlayerObject()
+    {
+        isPlayerObjectCreated = true;
+    }
+
+    public void DestroyPlayerObject()
+    {
+        isPlayerObjectCreated = false;
+    }
+
+    public bool IsPlayerObjectCreated()
+    {
+        return isPlayerObjectCreated;
+    }
+
     public void Update()
     {
-        UpdatePosition();
-        UpdateRotation();
-
+        if (isPlayerObjectCreated)
+        {
+            UpdatePosition();
+            UpdateRotation();
+        }
     }
 
     void UpdatePosition()

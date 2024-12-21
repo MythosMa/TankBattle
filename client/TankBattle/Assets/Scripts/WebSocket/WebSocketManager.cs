@@ -64,6 +64,9 @@ public class WebSocketManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+#if !UNITY_WEBGL || !UNITY_EDITOR
+        ws.DispatchMessageQueue();
+#endif
     }
 
     public void SendNormalData(string command, string data)

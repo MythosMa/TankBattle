@@ -3,6 +3,7 @@ package game
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -31,6 +32,7 @@ func (p *Player) SetPlayerName(playerName string) {
 	p.DataModel = &PlayerDataModel{
 		PlayerName: playerName,
 		Direction:  constants.InputDirectionNone,
+		TankIndex:  rand.Intn(4),
 		PositionX:  0,
 		PositionZ:  0,
 	}
@@ -51,6 +53,7 @@ func (p *Player) StartPlayer() {
 
 func (p *Player) StartGameLoop() {
 	p.playerRunning = true
+	p.IsPlayerModelUpdate = true
 	go p.GameLoop()
 }
 
@@ -92,7 +95,7 @@ func (p *Player) Update() {
 
 func (p *Player) GetPlayerModel() *PlayerDataModel {
 	if p.IsPlayerModelUpdate {
-		p.IsPlayerModelUpdate = false
+		// p.IsPlayerModelUpdate = false
 		return p.DataModel
 	}
 	return nil
@@ -190,6 +193,8 @@ func (p *Player) HandleLogin(message Message) {
 		log.Println("WebSocket message marshal error:", err)
 		return
 	}
+
+	log.Println("SendDataMessage:", string(dataJson))
 
 	p.SendDataMessage(
 		map[string]interface{}{

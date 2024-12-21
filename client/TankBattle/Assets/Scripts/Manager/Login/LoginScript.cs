@@ -26,7 +26,8 @@ public class LoginScript : MonoBehaviour
         LoginResponseData response = JsonUtility.FromJson<LoginResponseData>(resultData);
         if (response.Success)
         {
-            PlayerModel.Instance.SetPlayerName(response.PlayerName);
+            PlayerModel.Instance.InitPlayerName(response.PlayerName);
+            PlayerController.Instance.StartController();
             GameController.Instance.StartGame();
         }
         else
