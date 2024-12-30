@@ -6,6 +6,8 @@ public class Player
     private string playerName;
     private string inputDirection;
 
+    private string currentDirection;
+
     private int tankIndex;
     private float positionX;
     private float positionZ;
@@ -40,6 +42,16 @@ public class Player
         return inputDirection;
     }
 
+    public void SetCurrentDirection(string direction)
+    {
+        currentDirection = direction;
+    }
+
+    public string GetCurrentDirection()
+    {
+        return currentDirection;
+    }
+
     public void SetTank(int index, GameObject tankObj)
     {
         tankIndex = index;
@@ -65,6 +77,11 @@ public class Player
     {
         this.positionX = positionX;
         this.positionZ = positionZ;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return new Vector3(positionX, 0, positionZ);
     }
 
     public void CreatePlayerObject()
@@ -98,7 +115,7 @@ public class Player
 
     void UpdateRotation()
     {
-        switch (inputDirection)
+        switch (currentDirection)
         {
             case InputDirection.Up:
                 tank.transform.rotation = Quaternion.Euler(0, 0, 0);

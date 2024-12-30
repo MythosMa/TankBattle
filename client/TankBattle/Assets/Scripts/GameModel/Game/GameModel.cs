@@ -50,7 +50,7 @@ public class GameModel : MonoBehaviour
             GameController.Instance.CreatePlayerTank(newPlayer);
             newPlayer.SetPlayerName(playerData.PlayerName);
             newPlayer.SetPosition(playerData.PositionX, playerData.PositionZ);
-            newPlayer.SetInputDirection(playerData.Direction);
+            newPlayer.SetCurrentDirection(playerData.Direction);
             newPlayer.CreatePlayerObject();
             players.Add(newPlayer);
         });
@@ -71,13 +71,13 @@ public class GameModel : MonoBehaviour
                 if (player.IsPlayerObjectCreated())
                 {
                     player.SetPosition(playerData.PositionX, playerData.PositionZ);
-                    player.SetInputDirection(playerData.Direction);
+                    player.SetCurrentDirection(playerData.Direction);
                 }
                 else
                 {
                     GameController.Instance.CreatePlayerTank(player);
                     player.SetPosition(playerData.PositionX, playerData.PositionZ);
-                    player.SetInputDirection(playerData.Direction);
+                    player.SetCurrentDirection(playerData.Direction);
                     player.CreatePlayerObject();
                 }
             }
@@ -102,6 +102,7 @@ public class GameModel : MonoBehaviour
     public class PlayerData
     {
         public string PlayerName;
+        public string InputDirection;
         public string Direction;
         public int TankIndex;
         public float PositionX;

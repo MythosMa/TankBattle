@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    public static float MaxX = 100.0f;
+    public static float MinX = -100.0f;
+    public static float MaxZ = 100.0f;
+    public static float MinZ = -100.0f;
     public static GameController Instance;
 
     public bool isGameRunning = false;

@@ -99,6 +99,7 @@ public class PlayerModel : MonoBehaviour
     public class PlayerModelResponseData
     {
         public string PlayerName;
+        public string InputDirction;
         public string Direction;
         public int TankIndex;
         public float PositionX;

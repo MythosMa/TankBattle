@@ -1,9 +1,10 @@
 package game
 
 type PlayerDataModel struct {
-	PlayerName string
-	Direction  string
-	TankIndex  int
-	PositionX  float64
-	PositionZ  float64
+	PlayerName     string
+	InputDirection string
+	Direction      string
+	TankIndex      int
+	PositionX      float64
+	PositionZ      float64
 }

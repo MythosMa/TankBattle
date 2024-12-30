@@ -30,11 +30,12 @@ func NewPlayer(conn *websocket.Conn) *Player {
 func (p *Player) SetPlayerName(playerName string) {
 	p.PlayerName = playerName
 	p.DataModel = &PlayerDataModel{
-		PlayerName: playerName,
-		Direction:  constants.InputDirectionNone,
-		TankIndex:  rand.Intn(4),
-		PositionX:  0,
-		PositionZ:  0,
+		PlayerName:     playerName,
+		InputDirection: constants.InputDirectionUp,
+		Direction:      constants.InputDirectionNone,
+		TankIndex:      rand.Intn(4),
+		PositionX:      0,
+		PositionZ:      0,
 	}
 	p.StartGameLoop()
 }
@@ -77,7 +78,7 @@ func (p *Player) GameLoop() {
 }
 
 func (p *Player) Update() {
-	direction := p.DataModel.Direction
+	direction := p.DataModel.InputDirection
 	switch direction {
 	case constants.InputDirectionNone:
 		return
@@ -90,6 +91,7 @@ func (p *Player) Update() {
 	case constants.InputDirectionRight:
 		p.DataModel.PositionX += 0.1
 	}
+	p.DataModel.Direction = direction
 	p.IsPlayerModelUpdate = true
 }
 
@@ -156,7 +158,7 @@ func (p *Player) HandlePlayerModel(message Message) {
 	}
 
 	p.DataModel.PlayerName = data.PlayerName
-	p.DataModel.Direction = data.InputDirection
+	p.DataModel.InputDirection = data.InputDirection
 }
 
 // login ===============
