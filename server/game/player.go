@@ -16,7 +16,7 @@ type Player struct {
 	PlayerName          string
 	Conn                *websocket.Conn
 	DataModel           *PlayerDataModel
-	playerRunning       bool
+	PlayerRunning       bool
 	stopLoopMu          sync.Mutex
 	IsPlayerModelUpdate bool
 	MapRange            []int
@@ -58,7 +58,7 @@ func (p *Player) StartPlayer() {
 }
 
 func (p *Player) StartGameLoop() {
-	p.playerRunning = true
+	p.PlayerRunning = true
 	p.IsPlayerModelUpdate = true
 	go p.GameLoop()
 }
@@ -74,7 +74,7 @@ func (p *Player) GameLoop() {
 
 		// 检查是否要停止循环
 		p.stopLoopMu.Lock()
-		if !p.playerRunning {
+		if !p.PlayerRunning {
 			p.stopLoopMu.Unlock()
 			return // 退出循环
 		}
@@ -126,7 +126,7 @@ func (p *Player) ReceiveDataMessage() {
 		if err != nil {
 			log.Println("WebSocket read error:", err)
 			p.stopLoopMu.Lock()
-			p.playerRunning = false
+			p.PlayerRunning = false
 			p.stopLoopMu.Unlock()
 			GetGameInstance().RemovePlayer(p)
 			p.Conn.Close()
@@ -197,7 +197,7 @@ func (p *Player) HandleLogin(message Message) {
 		errMessage = "Player name already exists"
 	} else {
 		p.SetPlayerName(data.PlayerName)
-		GetGameInstance().AddPlayer(p)
+		// GetGameInstance().AddPlayer(p)
 		success = true
 	}
 

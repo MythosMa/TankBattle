@@ -10,7 +10,7 @@ import (
 )
 
 type Game struct {
-	Players  map[string]*Player
+	Players  []*Player
 	mu       sync.Mutex
 	MapRange []int
 }
@@ -29,7 +29,7 @@ func GetGameInstance() *Game {
 // NewGame 创建一个新的 Game 实例
 func NewGame() *Game {
 	game := &Game{
-		Players:  make(map[string]*Player),
+		Players:  []*Player{},
 		MapRange: []int{-99, 99},
 	}
 	go game.HandleGameLoop()
@@ -48,9 +48,11 @@ func (g *Game) HandleGameLoop() {
 func (g *Game) BroadGameData() {
 	var playerModels []PlayerDataModel = make([]PlayerDataModel, 0)
 	for _, player := range g.Players {
-		playerModel := player.GetPlayerModel()
-		if playerModel != nil {
-			playerModels = append(playerModels, *playerModel)
+		if player.PlayerRunning {
+			playerModel := player.GetPlayerModel()
+			if playerModel != nil {
+				playerModels = append(playerModels, *playerModel)
+			}
 		}
 	}
 
@@ -81,18 +83,32 @@ func (g *Game) AddPlayer(player *Player) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	player.SetMapRange(g.MapRange)
-	g.Players[player.PlayerName] = player
-	g.Broadcast("Player " + player.PlayerName + " joined the game")
+	g.Players = append(g.Players, player)
+	// g.Players[player.PlayerName] = player
+	// g.Broadcast("Player " + player.PlayerName + " joined the game")
 }
 
 // RemovePlayer 从游戏中移除玩家
 func (g *Game) RemovePlayer(player *Player) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	if player.PlayerName != "" {
-		delete(g.Players, player.PlayerName)
-		g.Broadcast("Player " + player.PlayerName + " left the game")
+	for i, v := range g.Players {
+		if v == player {
+			g.Players = append(g.Players[:i], g.Players[i+1:]...)
+			g.Broadcast("Player " + player.PlayerName + " left the game")
+			break
+		}
 	}
+	// if player.PlayerName != "" {
+	// 	delete(g.Players, player.PlayerName)
+	// 	g.Broadcast("Player " + player.PlayerName + " left the game")
+	// }
+}
+
+func (g *Game) PlayerAddGame(player *Player) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.BroadcastWithoutPlayers("Player "+player.PlayerName+" left the game", []*Player{player})
 }
 
 // Broadcast 向所有玩家广播消息
@@ -105,12 +121,34 @@ func (g *Game) Broadcast(message string) {
 	}
 }
 
+func (g *Game) BroadcastWithoutPlayers(message string, players []*Player) {
+	exclude := make(map[string]struct{})
+	for _, player := range players {
+		exclude[player.PlayerName] = struct{}{}
+	}
+
+	for _, player := range g.Players {
+		if _, exists := exclude[player.PlayerName]; !exists {
+			player.SendDataMessage(map[string]interface{}{
+				"Command": constants.CommandNormalMessage,
+				"Data":    message,
+			})
+		}
+	}
+}
+
 // CheckHasPlayer 检查玩家是否存在
 func (g *Game) CheckHasPlayer(PlayerName string) bool {
 	g.mu.Lock()
 	defer g.mu.Unlock()
-	_, ok := g.Players[PlayerName]
-	return ok
+	for _, player := range g.Players {
+		if player.PlayerName == PlayerName {
+			return true
+		}
+	}
+	return false
+	// _, ok := g.Players[PlayerName]
+	// return ok
 }
 
 type GameDataModel struct {

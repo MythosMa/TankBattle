@@ -35,6 +35,7 @@ public class GameModel : MonoBehaviour
 
     public void HandleGameModelMessage(string responseMessage)
     {
+        Debug.Log("HandleGameModelMessage: " + responseMessage);
         GameModelResponseData data = JsonUtility.FromJson<GameModelResponseData>(responseMessage);
         HashSet<string> playerDataNames = new HashSet<string>(data.PlayerDataModels.Select(playerData => playerData.PlayerName));
         HashSet<string> playerNames = new HashSet<string>(players.Select(player => player.GetPlayerName()));
@@ -49,6 +50,7 @@ public class GameModel : MonoBehaviour
 
             GameController.Instance.CreatePlayerTank(newPlayer);
             newPlayer.SetPlayerName(playerData.PlayerName);
+            newPlayer.SetTankIndex(playerData.TankIndex);
             newPlayer.SetPosition(playerData.PositionX, playerData.PositionZ);
             newPlayer.SetCurrentDirection(playerData.Direction);
             newPlayer.CreatePlayerObject();
@@ -75,10 +77,11 @@ public class GameModel : MonoBehaviour
                 }
                 else
                 {
-                    GameController.Instance.CreatePlayerTank(player);
+                    player.SetTankIndex(playerData.TankIndex);
                     player.SetPosition(playerData.PositionX, playerData.PositionZ);
                     player.SetCurrentDirection(playerData.Direction);
                     player.CreatePlayerObject();
+                    GameController.Instance.CreatePlayerTank(player);
                 }
             }
         });
@@ -90,6 +93,11 @@ public class GameModel : MonoBehaviour
         //     player.SetPosition(playerData.PositionX, playerData.PositionZ);
         //     player.SetInputDirection(playerData.InputDirection);
         // });
+    }
+
+    public List<Player> GetPlayers()
+    {
+        return players;
     }
 
     [Serializable]

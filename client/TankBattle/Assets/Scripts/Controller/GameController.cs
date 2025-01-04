@@ -50,6 +50,7 @@ public class GameController : MonoBehaviour
     public void StartGame()
     {
         this.isGameRunning = true;
+        CameraController.Instance.ResetCameraToPlayer();
         UIController.Instance.SetLoginUIVisible(false);
         GameModel.Instance.AddPlayer(PlayerModel.Instance.GetPlayer());
     }

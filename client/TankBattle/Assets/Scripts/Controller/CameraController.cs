@@ -17,6 +17,8 @@ public class CameraController : MonoBehaviour
     // 场景边界最大值
     public Vector2 sceneBoundsMax;
 
+    private int lookAtPlayerIndex = -1;
+
     private void Awake()
     {
         // 如果实例为空，则创建实例，并设置 DontDestroyOnLoad
@@ -55,9 +57,13 @@ public class CameraController : MonoBehaviour
             // 否则，跟随其他对象
             LookAtOthers();
         }
+    }
 
-
-
+    public void ResetCameraToPlayer()
+    {
+        lookAtPlayerIndex = -1;
+        Vector3 targetPosition = PlayerModel.Instance.GetPlayer().GetPosition();
+        mainCamera.transform.position = new Vector3(targetPosition.x, mainCamera.transform.position.y, targetPosition.z);
     }
 
     // 跟随玩家
@@ -72,7 +78,16 @@ public class CameraController : MonoBehaviour
     // 跟随其他对象
     private void LookAtOthers()
     {
-
+        List<Player> players = GameModel.Instance.GetPlayers();
+        if (lookAtPlayerIndex == -1 && players.Count > 0)
+        {
+            lookAtPlayerIndex = UnityEngine.Random.Range(0, players.Count);
+        }
+        if (lookAtPlayerIndex != -1)
+        {
+            Player target = players[lookAtPlayerIndex];
+            FollowTarget(target.GetPosition());
+        }
     }
 
     // 跟随目标

@@ -24,5 +24,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Println("WebSocket connection established")
 
 	player := game.NewPlayer(conn)
+	game.GetGameInstance().AddPlayer(player)
 	player.StartPlayer()
 }
