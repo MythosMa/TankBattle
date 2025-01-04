@@ -81,7 +81,7 @@ public class Player
 
     public Vector3 GetPosition()
     {
-        return new Vector3(positionX, 0, positionZ);
+        return new Vector3(positionX, 0.15f, positionZ);
     }
 
     public void CreatePlayerObject()

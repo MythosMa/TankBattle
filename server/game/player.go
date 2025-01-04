@@ -19,6 +19,7 @@ type Player struct {
 	playerRunning       bool
 	stopLoopMu          sync.Mutex
 	IsPlayerModelUpdate bool
+	MapRange            []int
 }
 
 func NewPlayer(conn *websocket.Conn) *Player {
@@ -38,6 +39,10 @@ func (p *Player) SetPlayerName(playerName string) {
 		PositionZ:      0,
 	}
 	p.StartGameLoop()
+}
+
+func (p *Player) SetMapRange(mapRange []int) {
+	p.MapRange = mapRange
 }
 
 // server =============
@@ -91,6 +96,17 @@ func (p *Player) Update() {
 	case constants.InputDirectionRight:
 		p.DataModel.PositionX += 0.1
 	}
+	if p.DataModel.PositionX > float64(p.MapRange[1]) {
+		p.DataModel.PositionX = float64(p.MapRange[1])
+	} else if p.DataModel.PositionX < float64(p.MapRange[0]) {
+		p.DataModel.PositionX = float64(p.MapRange[0])
+	}
+	if p.DataModel.PositionZ > float64(p.MapRange[1]) {
+		p.DataModel.PositionZ = float64(p.MapRange[1])
+	} else if p.DataModel.PositionZ < float64(p.MapRange[0]) {
+		p.DataModel.PositionZ = float64(p.MapRange[0])
+	}
+
 	p.DataModel.Direction = direction
 	p.IsPlayerModelUpdate = true
 }

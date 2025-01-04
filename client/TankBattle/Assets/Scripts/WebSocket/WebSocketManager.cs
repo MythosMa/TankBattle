@@ -114,7 +114,7 @@ public class WebSocketManager : MonoBehaviour
 
     private void HandleServerMessage(string message)
     {
-        Debug.Log("Received message from server: " + message);
+        // Debug.Log("Received message from server: " + message);
         var serverMessage = JsonUtility.FromJson<ServerMessage>(message);
         if (serverMessage.RequestId != null && pendingPromises.ContainsKey(serverMessage.RequestId))
         {

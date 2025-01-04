@@ -10,8 +10,9 @@ import (
 )
 
 type Game struct {
-	Players map[string]*Player
-	mu      sync.Mutex
+	Players  map[string]*Player
+	mu       sync.Mutex
+	MapRange []int
 }
 
 var gameInstance *Game
@@ -28,7 +29,8 @@ func GetGameInstance() *Game {
 // NewGame 创建一个新的 Game 实例
 func NewGame() *Game {
 	game := &Game{
-		Players: make(map[string]*Player),
+		Players:  make(map[string]*Player),
+		MapRange: []int{-99, 99},
 	}
 	go game.HandleGameLoop()
 	return game
@@ -78,6 +80,7 @@ func (g *Game) BroadGameData() {
 func (g *Game) AddPlayer(player *Player) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	player.SetMapRange(g.MapRange)
 	g.Players[player.PlayerName] = player
 	g.Broadcast("Player " + player.PlayerName + " joined the game")
 }
